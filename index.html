@@ -7,11 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NotifyMe">
-<meta name="description" content="Încarcă fișiere și primește notificări zilnice">
 <title>NotifyMe</title>
 <link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
   :root {
     --bg: #0d0d1a;
@@ -20,7 +19,6 @@
     --surface3: #252545;
     --accent: #7c6ff7;
     --accent2: #a78bfa;
-    --accent3: #c4b5fd;
     --text: #f0eeff;
     --text2: #a8a0d0;
     --text3: #6b6390;
@@ -41,7 +39,6 @@
     flex-direction: column;
     max-width: 480px;
     margin: 0 auto;
-    position: relative;
   }
   body::before {
     content: '';
@@ -51,15 +48,10 @@
     background: radial-gradient(circle, rgba(124,111,247,0.12) 0%, transparent 70%);
     pointer-events: none; z-index: 0;
   }
-
-  /* Header */
   .header {
     padding: 20px 20px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; position: relative; z-index: 1;
   }
   .logo { display: flex; align-items: center; gap: 10px; }
   .logo-icon {
@@ -69,350 +61,236 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 18px;
   }
-  .logo-text { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text); }
+  .logo-text { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
   .logo-text span { color: var(--accent2); }
   .header-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 8px 14px;
-    color: var(--text2);
-    font-size: 13px;
-    cursor: pointer;
-    font-family: 'Space Grotesk', sans-serif;
-    transition: all 0.2s;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 14px;
+    color: var(--text2); font-size: 13px; cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif; transition: all 0.2s;
   }
   .header-btn:hover { background: var(--surface3); color: var(--text); }
-
-  /* Nav */
   .nav {
-    display: flex;
-    gap: 4px;
+    display: flex; gap: 4px;
     padding: 16px 20px 12px;
-    flex-shrink: 0;
-    position: relative; z-index: 1;
+    flex-shrink: 0; position: relative; z-index: 1;
   }
   .nav-btn {
-    flex: 1;
-    padding: 9px 0;
-    border: none;
+    flex: 1; padding: 9px 0; border: none;
     border-radius: var(--radius-sm);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s;
-    background: var(--surface2);
-    color: var(--text3);
-    display: flex; align-items: center; justify-content: center; gap: 5px;
+    font-size: 11px; font-weight: 500; cursor: pointer;
+    transition: all 0.25s; background: var(--surface2); color: var(--text3);
+    display: flex; align-items: center; justify-content: center; gap: 4px;
   }
   .nav-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 20px rgba(124,111,247,0.35); }
   .nav-btn:not(.active):hover { background: var(--surface3); color: var(--text2); }
-
-  /* Content */
   .content {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+    flex: 1; overflow-y: auto; overflow-x: hidden;
     padding: 0 20px 100px;
-    position: relative; z-index: 1;
-    scrollbar-width: none;
+    position: relative; z-index: 1; scrollbar-width: none;
   }
   .content::-webkit-scrollbar { display: none; }
-
-  /* Panels */
   .panel { display: none; padding-top: 8px; }
   .panel.active { display: block; }
-
-  /* Cards */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 14px;
   }
   .card-title { font-size: 13px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
 
-  /* Upload zone */
+  /* Upload */
   .upload-zone {
-    border: 2px dashed rgba(124,111,247,0.3);
-    border-radius: var(--radius);
-    padding: 36px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.25s;
-    background: rgba(124,111,247,0.04);
-    margin-bottom: 14px;
+    border: 2px dashed rgba(124,111,247,0.3); border-radius: var(--radius);
+    padding: 30px 20px; text-align: center; cursor: pointer;
+    transition: all 0.25s; background: rgba(124,111,247,0.04); margin-bottom: 14px;
   }
-  .upload-zone:hover, .upload-zone.drag-over {
-    border-color: var(--accent);
-    background: rgba(124,111,247,0.1);
-  }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: var(--accent); background: rgba(124,111,247,0.1); }
   .upload-icon { font-size: 36px; margin-bottom: 10px; }
-  .upload-title { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .upload-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
   .upload-sub { font-size: 13px; color: var(--text3); }
-  .upload-types {
-    display: flex; gap: 6px; justify-content: center; margin-top: 14px; flex-wrap: wrap;
+  .upload-badge {
+    display: inline-block; background: rgba(124,111,247,0.2);
+    border: 1px solid rgba(124,111,247,0.4); border-radius: 8px;
+    padding: 4px 12px; font-size: 12px; color: var(--accent2); font-weight: 500; margin-top: 12px;
   }
-  .type-badge {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 11px;
-    color: var(--text2);
-    font-weight: 500;
-  }
-  #file-input { display: none; }
+  #word-input { display: none; }
 
-  /* File list */
-  .file-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    margin-bottom: 8px;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-  .file-item:hover { border-color: var(--border); }
-  .file-icon {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-  .file-icon.img { background: rgba(52, 211, 153, 0.15); }
-  .file-icon.pdf { background: rgba(248, 113, 113, 0.15); }
-  .file-icon.txt { background: rgba(167, 139, 250, 0.15); }
-  .file-info { flex: 1; min-width: 0; }
-  .file-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .file-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
-  .file-del {
-    background: none; border: none;
-    color: var(--text3); cursor: pointer;
-    font-size: 18px; padding: 4px;
-    border-radius: 6px;
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-  .file-del:hover { color: var(--danger); background: rgba(248,113,113,0.1); }
-
-  /* Text input */
-  textarea {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    resize: none;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  textarea:focus { border-color: var(--accent); }
-  textarea::placeholder { color: var(--text3); }
-
-  input[type="text"], input[type="email"], input[type="time"] {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 12px;
-  }
-  input[type="text"]:focus, input[type="email"]:focus, input[type="time"]:focus {
-    border-color: var(--accent);
-  }
-  input::placeholder { color: var(--text3); }
-  input[type="time"] { color-scheme: dark; }
-
-  label.field-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 7px;
-  }
-
-  /* Toggle */
-  .toggle-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  .toggle-row:last-child { border-bottom: none; }
-  .toggle-label { font-size: 14px; color: var(--text); font-weight: 400; }
-  .toggle-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
-  .toggle {
-    position: relative;
-    width: 46px; height: 26px;
-    flex-shrink: 0;
-  }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider {
-    position: absolute; inset: 0;
-    background: var(--surface3);
-    border-radius: 26px;
-    cursor: pointer;
-    transition: 0.3s;
-    border: 1px solid var(--border);
-  }
-  .toggle-slider::before {
-    content: '';
-    position: absolute;
-    width: 18px; height: 18px;
-    left: 3px; top: 3px;
-    background: var(--text3);
-    border-radius: 50%;
-    transition: 0.3s;
-  }
-  .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
-  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: white; }
-
-  /* Buttons */
-  .btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: white;
-    box-shadow: 0 4px 24px rgba(124,111,247,0.3);
-  }
-  .btn-primary:hover { box-shadow: 0 6px 30px rgba(124,111,247,0.5); transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text2);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover { background: var(--surface3); color: var(--text); }
-
-  /* Notification item */
-  .notif-item {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 14px;
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    margin-bottom: 8px;
-    border-left: 3px solid var(--accent);
-  }
-  .notif-dot {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: rgba(124,111,247,0.2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
-  }
-  .notif-body { flex: 1; }
-  .notif-title { font-size: 14px; font-weight: 500; color: var(--text); }
-  .notif-time { font-size: 12px; color: var(--text3); margin-top: 3px; }
-  .notif-preview { font-size: 13px; color: var(--text2); margin-top: 5px; line-height: 1.4; }
-
-  /* Stats row */
-  .stats-row {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 14px;
-  }
+  /* Stats */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
   .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 12px; text-align: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 12px; text-align: center;
   }
   .stat-number { font-size: 24px; font-weight: 600; color: var(--accent2); }
   .stat-label { font-size: 11px; color: var(--text3); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
 
-  /* Toast */
+  /* Preview */
+  .preview-card {
+    background: linear-gradient(135deg, rgba(124,111,247,0.15), rgba(167,139,250,0.08));
+    border: 1px solid rgba(124,111,247,0.3); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 14px;
+  }
+  .preview-label { font-size: 11px; color: var(--accent2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; font-weight: 500; }
+  .preview-text { font-size: 15px; color: var(--text); line-height: 1.7; font-style: italic; }
+
+  /* Text items */
+  .text-item {
+    background: var(--surface2); border-radius: var(--radius-sm);
+    padding: 14px; margin-bottom: 8px;
+    border: 1px solid transparent; transition: all 0.2s;
+  }
+  .text-item:hover { border-color: var(--border); }
+  .text-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .text-num {
+    background: rgba(124,111,247,0.2); border-radius: 6px;
+    padding: 3px 10px; font-size: 12px; color: var(--accent2); font-weight: 500;
+  }
+  .text-actions { display: flex; gap: 6px; }
+  .tbtn {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 12px; padding: 4px 8px; border-radius: 6px;
+    transition: all 0.2s; font-family: 'Space Grotesk', sans-serif;
+  }
+  .tbtn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .tbtn.del:hover { color: var(--danger); background: rgba(248,113,113,0.1); }
+  .text-content {
+    font-size: 14px; color: var(--text2); line-height: 1.6;
+    max-height: 72px; overflow: hidden; position: relative;
+  }
+  .text-content.expanded { max-height: none; }
+  .text-content:not(.expanded)::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 30px; background: linear-gradient(transparent, var(--surface2));
+  }
+  .expand-btn {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 11px; padding: 4px 0; margin-top: 4px;
+    font-family: 'Space Grotesk', sans-serif; transition: color 0.2s;
+  }
+  .expand-btn:hover { color: var(--accent2); }
+
+  /* Time slots */
+  .time-slot {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border-radius: var(--radius-sm);
+    padding: 10px 14px; margin-bottom: 8px; border: 1px solid var(--border);
+  }
+  .time-slot-icon { font-size: 16px; }
+  .slot-time-inp {
+    flex: 1; background: none; border: none;
+    color: var(--text); font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px; font-weight: 500; outline: none;
+    padding: 0; margin: 0; color-scheme: dark;
+  }
+  .time-del {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 18px; padding: 2px 6px; border-radius: 6px; transition: all 0.2s;
+  }
+  .time-del:hover { color: var(--danger); background: rgba(248,113,113,0.1); }
+  .add-time-btn {
+    width: 100%; padding: 11px;
+    background: rgba(124,111,247,0.1);
+    border: 1px dashed rgba(124,111,247,0.3); border-radius: var(--radius-sm);
+    color: var(--accent2); font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; cursor: pointer; transition: all 0.2s; margin-bottom: 14px;
+  }
+  .add-time-btn:hover { background: rgba(124,111,247,0.2); border-color: var(--accent); }
+
+  /* Days */
+  .days-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .day-chip {
+    padding: 7px 11px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text3);
+  }
+  .day-chip.on { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 12px rgba(124,111,247,0.3); }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { font-size: 14px; color: var(--text); }
+  .toggle-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .toggle { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: var(--surface3);
+    border-radius: 26px; cursor: pointer; transition: 0.3s; border: 1px solid var(--border);
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute; width: 18px; height: 18px;
+    left: 3px; top: 3px; background: var(--text3); border-radius: 50%; transition: 0.3s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: white; }
+
+  input[type="text"], input[type="email"] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 14px; color: var(--text);
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; outline: none;
+    transition: border-color 0.2s; margin-bottom: 12px;
+  }
+  input[type="text"]:focus, input[type="email"]:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--text3); }
+  label.fl { display: block; font-size: 12px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; }
+  textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px; color: var(--text);
+    font-family: 'Space Grotesk', sans-serif; font-size: 14px; line-height: 1.6;
+    resize: none; outline: none; transition: border-color 0.2s; margin-bottom: 10px;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--text3); }
+
+  .btn {
+    width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
+    font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 500;
+    cursor: pointer; transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; box-shadow: 0 4px 24px rgba(124,111,247,0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 6px 30px rgba(124,111,247,0.5); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    background: var(--surface2); color: var(--text2);
+    border: 1px solid var(--border); margin-bottom: 10px;
+  }
+  .btn-secondary:hover { background: var(--surface3); color: var(--text); }
+
+  /* History */
+  .h-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px; background: var(--surface2); border-radius: var(--radius-sm);
+    margin-bottom: 8px; border-left: 3px solid var(--accent);
+  }
+  .h-dot {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: rgba(124,111,247,0.2);
+    display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+  }
+  .h-title { font-size: 13px; font-weight: 500; color: var(--text); }
+  .h-time { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
   .toast {
-    position: fixed;
-    bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--surface3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 20px;
-    font-size: 14px;
-    color: var(--text);
-    opacity: 0;
-    transition: all 0.35s;
-    z-index: 999;
-    white-space: nowrap;
-    max-width: 90vw;
-    text-align: center;
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface3); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 20px; font-size: 14px; color: var(--text); opacity: 0; transition: all 0.35s;
+    z-index: 999; white-space: nowrap; max-width: 90vw; text-align: center;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { border-color: rgba(52,211,153,0.4); color: var(--success); }
   .toast.warning { border-color: rgba(251,191,36,0.4); color: var(--warning); }
   .toast.error { border-color: rgba(248,113,113,0.4); color: var(--danger); }
 
-  /* Empty state */
-  .empty-state {
-    text-align: center; padding: 40px 20px;
-  }
-  .empty-icon { font-size: 42px; margin-bottom: 12px; opacity: 0.5; }
-  .empty-text { font-size: 15px; color: var(--text3); }
-
-  /* Install banner */
-  .install-banner {
-    background: linear-gradient(135deg, rgba(124,111,247,0.15), rgba(167,139,250,0.1));
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 14px;
-  }
-  .install-text { flex: 1; font-size: 13px; color: var(--text2); line-height: 1.5; }
-  .install-text strong { color: var(--text); display: block; margin-bottom: 3px; }
-  .install-btn {
-    background: var(--accent); color: white;
-    border: none; border-radius: var(--radius-sm);
-    padding: 10px 16px; font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    white-space: nowrap; transition: all 0.2s;
-    flex-shrink: 0;
-  }
-  .install-btn:hover { background: var(--accent2); }
-
-  /* Schedule row */
-  .schedule-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(124,111,247,0.15);
-    border: 1px solid rgba(124,111,247,0.3);
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 12px; color: var(--accent2);
-    margin: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .schedule-chip:hover { background: rgba(124,111,247,0.25); }
-  .schedule-chip.selected { background: var(--accent); color: white; border-color: var(--accent); }
-
-  .section-gap { margin-bottom: 6px; }
+  .empty { text-align: center; padding: 36px 20px; }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-text { font-size: 14px; color: var(--text3); line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -426,199 +304,119 @@
 </div>
 
 <div class="nav">
-  <button class="nav-btn active" onclick="showPanel('upload')" id="nav-upload">📁 Fișiere</button>
-  <button class="nav-btn" onclick="showPanel('schedule')" id="nav-schedule">⏰ Program</button>
-  <button class="nav-btn" onclick="showPanel('history')" id="nav-history">📋 Istoric</button>
-  <button class="nav-btn" onclick="showPanel('settings')" id="nav-settings">⚙️ Setări</button>
+  <button class="nav-btn active" onclick="showPanel('texte')" id="nav-texte">📝 Texte</button>
+  <button class="nav-btn" onclick="showPanel('program')" id="nav-program">⏰ Program</button>
+  <button class="nav-btn" onclick="showPanel('email')" id="nav-email">📧 Email</button>
+  <button class="nav-btn" onclick="showPanel('istoric')" id="nav-istoric">📋 Istoric</button>
 </div>
 
 <div class="content">
 
-  <!-- PANEL: Upload -->
-  <div class="panel active" id="panel-upload">
-    <div id="install-banner" class="install-banner" style="display:none;">
-      <div>📲</div>
-      <div class="install-text">
-        <strong>Instalează ca aplicație</strong>
-        Adaugă NotifyMe pe ecranul principal pentru notificări native.
-      </div>
-      <button class="install-btn" onclick="installPWA()">Instalează</button>
-    </div>
-
+  <!-- TEXTE -->
+  <div class="panel active" id="panel-texte">
     <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-number" id="stat-files">0</div>
-        <div class="stat-label">Fișiere</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="stat-notif">0</div>
-        <div class="stat-label">Notif.</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="stat-emails">0</div>
-        <div class="stat-label">Email-uri</div>
-      </div>
+      <div class="stat-card"><div class="stat-number" id="s-texts">0</div><div class="stat-label">Texte</div></div>
+      <div class="stat-card"><div class="stat-number" id="s-slots">0</div><div class="stat-label">Ore/zi</div></div>
+      <div class="stat-card"><div class="stat-number" id="s-sent">0</div><div class="stat-label">Trimise</div></div>
     </div>
 
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
-      <div class="upload-icon">☁️</div>
-      <div class="upload-title">Trage fișiere aici</div>
-      <div class="upload-sub">sau apasă pentru a selecta</div>
-      <div class="upload-types">
-        <span class="type-badge">📷 JPG/PNG</span>
-        <span class="type-badge">📄 PDF</span>
-        <span class="type-badge">📝 TXT</span>
-        <span class="type-badge">📎 DOCX</span>
-      </div>
+    <div class="upload-zone" id="upload-zone"
+      onclick="document.getElementById('word-input').click()"
+      ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+      <div class="upload-icon">📄</div>
+      <div class="upload-title">Încarcă fișier Word</div>
+      <div class="upload-sub">Fiecare paragraf devine un text separat</div>
+      <div class="upload-badge">📎 .DOCX acceptat</div>
     </div>
-    <input type="file" id="file-input" multiple accept="image/*,.pdf,.txt,.docx,.doc" onchange="handleFiles(this.files)">
+    <input type="file" id="word-input" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="handleWordFile(this.files[0])">
 
     <div class="card">
-      <div class="card-title">Text rapid</div>
-      <textarea id="quick-text" rows="4" placeholder="Scrie un text pe care vrei să îl primești ca notificare sau email zilnic..."></textarea>
-      <div style="margin-top: 10px; display: flex; gap: 8px;">
-        <button class="btn btn-secondary" style="flex:1; font-size:13px; padding: 10px;" onclick="saveText()">💾 Salvează text</button>
-        <button class="btn btn-primary" style="flex:1; font-size:13px; padding: 10px;" onclick="sendTestNotif()">🔔 Test notificare</button>
+      <div class="card-title">Adaugă text manual</div>
+      <textarea id="manual-text" rows="3" placeholder="Scrie un text pe care vrei să îl primești ca notificare..."></textarea>
+      <button class="btn btn-primary" onclick="addManualText()">➕ Adaugă text</button>
+    </div>
+
+    <div class="preview-card" id="preview-card" style="display:none;">
+      <div class="preview-label">✨ Previzualizare text aleatoriu</div>
+      <div class="preview-text" id="preview-text"></div>
+      <div style="margin-top:14px; display:flex; gap:8px;">
+        <button class="btn btn-secondary" style="flex:1; padding:10px; font-size:13px; margin:0;" onclick="showRandomPreview()">🔀 Alt text</button>
+        <button class="btn btn-primary" style="flex:1; padding:10px; font-size:13px;" onclick="sendTestNotif()">🔔 Test notif.</button>
       </div>
     </div>
 
-    <div id="files-list">
-      <div class="empty-state" id="empty-files">
-        <div class="empty-icon">📂</div>
-        <div class="empty-text">Niciun fișier încărcat încă</div>
+    <div id="texts-list"></div>
+  </div>
+
+  <!-- PROGRAM -->
+  <div class="panel" id="panel-program">
+    <div class="card">
+      <div class="card-title">Ore notificări zilnice</div>
+      <p style="font-size:13px; color:var(--text3); margin-bottom:16px; line-height:1.6;">
+        Adaugă oricâte ore dorești. La fiecare oră aleasă vei primi automat un text aleatoriu.
+      </p>
+      <div id="slots-list"></div>
+      <button class="add-time-btn" onclick="addTimeSlot()">＋ Adaugă oră</button>
+
+      <label class="fl">Zile active</label>
+      <div class="days-row" id="days-row">
+        <span class="day-chip on" data-day="0">Lun</span>
+        <span class="day-chip on" data-day="1">Mar</span>
+        <span class="day-chip on" data-day="2">Mie</span>
+        <span class="day-chip on" data-day="3">Joi</span>
+        <span class="day-chip on" data-day="4">Vin</span>
+        <span class="day-chip" data-day="5">Sâm</span>
+        <span class="day-chip" data-day="6">Dum</span>
+      </div>
+
+      <button class="btn btn-primary" onclick="activateAll()">⏰ Activează toate orele</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ore programate</div>
+      <div id="schedule-status">
+        <div class="empty"><div class="empty-icon">⏰</div><div class="empty-text">Nicio oră programată</div></div>
       </div>
     </div>
   </div>
 
-  <!-- PANEL: Schedule -->
-  <div class="panel" id="panel-schedule">
-    <div class="card">
-      <div class="card-title">Notificări zilnice</div>
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-label">Activează notificările</div>
-          <div class="toggle-sub">Primești un reminder zilnic</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-notif" onchange="saveSettings()">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-label">Include fișiere aleatorii</div>
-          <div class="toggle-sub">Un fișier din colecție</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-random" onchange="saveSettings()">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <label class="field-label" style="margin-top:16px;">Ora notificării</label>
-      <input type="time" id="notif-time" value="09:00" onchange="saveSettings()">
-
-      <label class="field-label">Zile active</label>
-      <div id="days-selector" style="margin-bottom: 14px;">
-        <span class="schedule-chip selected" data-day="0" onclick="toggleDay(this)">Lu</span>
-        <span class="schedule-chip selected" data-day="1" onclick="toggleDay(this)">Ma</span>
-        <span class="schedule-chip selected" data-day="2" onclick="toggleDay(this)">Mi</span>
-        <span class="schedule-chip selected" data-day="3" onclick="toggleDay(this)">Jo</span>
-        <span class="schedule-chip selected" data-day="4" onclick="toggleDay(this)">Vi</span>
-        <span class="schedule-chip" data-day="5" onclick="toggleDay(this)">Sâ</span>
-        <span class="schedule-chip" data-day="6" onclick="toggleDay(this)">Du</span>
-      </div>
-
-      <button class="btn btn-primary" onclick="scheduleNotification()">⏰ Programează acum</button>
-    </div>
-
+  <!-- EMAIL -->
+  <div class="panel" id="panel-email">
     <div class="card">
       <div class="card-title">Email zilnic</div>
       <div class="toggle-row">
         <div>
-          <div class="toggle-label">Trimite email zilnic</div>
-          <div class="toggle-sub">Rezumat cu fișierele tale</div>
+          <div class="toggle-label">Activează email zilnic</div>
+          <div class="toggle-sub">Text aleatoriu trimis pe email</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="toggle-email" onchange="saveSettings()">
           <span class="toggle-slider"></span>
         </label>
       </div>
-
-      <label class="field-label" style="margin-top:16px;">Adresa ta de email</label>
-      <input type="email" id="email-addr" placeholder="ex: eu@gmail.com" oninput="saveSettings()">
-
-      <label class="field-label">Ora trimiterii</label>
-      <input type="time" id="email-time" value="08:00" onchange="saveSettings()">
-
-      <label class="field-label">Subiect email</label>
-      <input type="text" id="email-subject" placeholder="Rezumatul zilnic NotifyMe" oninput="saveSettings()">
-
+      <label class="fl" style="margin-top:16px;">Adresa ta de email</label>
+      <input type="email" id="email-addr" placeholder="eu@gmail.com" oninput="saveSettings()">
+      <label class="fl">Subiect email</label>
+      <input type="text" id="email-subject" placeholder="Textul zilei — NotifyMe" oninput="saveSettings()">
       <button class="btn btn-primary" onclick="sendTestEmail()">📧 Trimite email test</button>
-      <p style="font-size:12px; color: var(--text3); margin-top: 10px; text-align:center; line-height: 1.6;">
-        ℹ️ Pentru trimiterea automată de emailuri, conectează aplicația la un serviciu gratuit precum <strong style="color:var(--text2)">EmailJS</strong> sau <strong style="color:var(--text2)">SMTP2GO</strong>.
-      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Titlu notificări push</div>
+      <label class="fl">Titlu</label>
+      <input type="text" id="notif-title-inp" placeholder="NotifyMe 🔔">
+      <button class="btn btn-secondary" onclick="saveSettings(); showToast('✅ Salvat!','success')">💾 Salvează</button>
     </div>
   </div>
 
-  <!-- PANEL: History -->
-  <div class="panel" id="panel-history">
-    <div class="card" style="padding: 14px;">
-      <div class="card-title" style="margin-bottom:8px;">Activitate recentă</div>
-      <div id="history-list">
-        <div class="empty-state" id="empty-history">
-          <div class="empty-icon">📋</div>
-          <div class="empty-text">Nicio activitate înregistrată</div>
-        </div>
-      </div>
+  <!-- ISTORIC -->
+  <div class="panel" id="panel-istoric">
+    <div class="card" style="padding:14px;">
+      <div class="card-title">Activitate recentă</div>
+      <div id="history-list"></div>
     </div>
-  </div>
-
-  <!-- PANEL: Settings -->
-  <div class="panel" id="panel-settings">
-    <div class="card">
-      <div class="card-title">Aplicație</div>
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-label">Mod vibration</div>
-          <div class="toggle-sub">Vibrație la notificări</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-vibrate" checked onchange="saveSettings()">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-label">Sunet notificări</div>
-          <div class="toggle-sub">Sunet la alertă</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-sound" onchange="saveSettings()">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Notificări</div>
-      <label class="field-label">Mesaj implicit notificare</label>
-      <input type="text" id="notif-msg" placeholder="E timpul să îți revezi fișierele!">
-      <label class="field-label">Titlu notificare</label>
-      <input type="text" id="notif-title-input" placeholder="NotifyMe 🔔">
-      <button class="btn btn-primary" style="margin-top:4px;" onclick="saveSettings(); showToast('Setări salvate!', 'success')">💾 Salvează setările</button>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Date</div>
-      <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="exportData()">📤 Exportă date (JSON)</button>
-      <button class="btn btn-secondary" onclick="clearData()">🗑️ Șterge toate datele</button>
-    </div>
-
-    <div style="text-align:center; padding: 20px; font-size: 12px; color: var(--text3);">
-      NotifyMe PWA v1.0 · Funcționează offline<br>
-      <span style="color:var(--accent2);">Instalează pe ecranul principal pentru experiență completă</span>
-    </div>
+    <button class="btn btn-secondary" onclick="clearHistory()">🗑️ Șterge istoricul</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="clearAll()">⚠️ Șterge toate datele</button>
   </div>
 
 </div>
@@ -626,84 +424,58 @@
 <div class="toast" id="toast"></div>
 
 <script>
-let files = [];
-let history = [];
-let settings = {};
-let deferredPrompt = null;
-let notifCount = 0;
-let emailCount = 0;
+let texts = [], timeSlots = [], history = [], settings = {}, sentCount = 0;
+let scheduledTimers = [];
 
-// Load from localStorage
-function loadData() {
+// ── Load / Save ────────────────────────────────────────────
+function load() {
   try {
-    files = JSON.parse(localStorage.getItem('nm_files') || '[]');
-    history = JSON.parse(localStorage.getItem('nm_history') || '[]');
-    settings = JSON.parse(localStorage.getItem('nm_settings') || '{}');
-    notifCount = parseInt(localStorage.getItem('nm_notif_count') || '0');
-    emailCount = parseInt(localStorage.getItem('nm_email_count') || '0');
-  } catch(e) { files = []; history = []; settings = {}; }
+    texts    = JSON.parse(localStorage.getItem('nm2_texts')  || '[]');
+    timeSlots= JSON.parse(localStorage.getItem('nm2_slots')  || '[]');
+    history  = JSON.parse(localStorage.getItem('nm2_hist')   || '[]');
+    settings = JSON.parse(localStorage.getItem('nm2_cfg')    || '{}');
+    sentCount= parseInt(localStorage.getItem('nm2_sent')     || '0');
+  } catch(e) { texts=[]; timeSlots=[]; history=[]; settings={}; }
+  if (timeSlots.length === 0) timeSlots = [{id: uid(), time: '09:00'}];
   applySettings();
-  renderFiles();
-  renderHistory();
-  updateStats();
+  renderTexts(); renderSlots(); renderScheduleStatus(); renderHistory();
+  updateStats(); showRandomPreview();
 }
 
-function saveData() {
-  localStorage.setItem('nm_files', JSON.stringify(files));
-  localStorage.setItem('nm_history', JSON.stringify(history));
-  localStorage.setItem('nm_notif_count', notifCount);
-  localStorage.setItem('nm_email_count', emailCount);
+function persist() {
+  localStorage.setItem('nm2_texts', JSON.stringify(texts));
+  localStorage.setItem('nm2_slots', JSON.stringify(timeSlots));
+  localStorage.setItem('nm2_hist',  JSON.stringify(history));
+  localStorage.setItem('nm2_cfg',   JSON.stringify(settings));
+  localStorage.setItem('nm2_sent',  sentCount);
 }
 
 function saveSettings() {
   settings = {
-    notifEnabled: document.getElementById('toggle-notif').checked,
     emailEnabled: document.getElementById('toggle-email').checked,
-    randomFile: document.getElementById('toggle-random').checked,
-    vibrate: document.getElementById('toggle-vibrate').checked,
-    sound: document.getElementById('toggle-sound').checked,
-    notifTime: document.getElementById('notif-time').value,
-    emailTime: document.getElementById('email-time').value,
-    emailAddr: document.getElementById('email-addr').value,
+    emailAddr:    document.getElementById('email-addr').value,
     emailSubject: document.getElementById('email-subject').value,
-    notifMsg: document.getElementById('notif-msg').value,
-    notifTitle: document.getElementById('notif-title-input').value,
-    days: getSelectedDays()
+    notifTitle:   document.getElementById('notif-title-inp').value,
+    days:         activeDays()
   };
-  localStorage.setItem('nm_settings', JSON.stringify(settings));
+  persist();
 }
 
 function applySettings() {
-  if (!settings) return;
-  if (settings.notifEnabled !== undefined) document.getElementById('toggle-notif').checked = settings.notifEnabled;
   if (settings.emailEnabled !== undefined) document.getElementById('toggle-email').checked = settings.emailEnabled;
-  if (settings.randomFile !== undefined) document.getElementById('toggle-random').checked = settings.randomFile;
-  if (settings.vibrate !== undefined) document.getElementById('toggle-vibrate').checked = settings.vibrate;
-  if (settings.sound !== undefined) document.getElementById('toggle-sound').checked = settings.sound;
-  if (settings.notifTime) document.getElementById('notif-time').value = settings.notifTime;
-  if (settings.emailTime) document.getElementById('email-time').value = settings.emailTime;
-  if (settings.emailAddr) document.getElementById('email-addr').value = settings.emailAddr;
+  if (settings.emailAddr)    document.getElementById('email-addr').value    = settings.emailAddr;
   if (settings.emailSubject) document.getElementById('email-subject').value = settings.emailSubject;
-  if (settings.notifMsg) document.getElementById('notif-msg').value = settings.notifMsg;
-  if (settings.notifTitle) document.getElementById('notif-title-input').value = settings.notifTitle;
+  if (settings.notifTitle)   document.getElementById('notif-title-inp').value = settings.notifTitle;
   if (settings.days) {
-    document.querySelectorAll('.schedule-chip').forEach(chip => {
-      if (settings.days.includes(parseInt(chip.dataset.day))) chip.classList.add('selected');
-      else chip.classList.remove('selected');
+    document.querySelectorAll('.day-chip').forEach(c => {
+      c.classList.toggle('on', settings.days.includes(parseInt(c.dataset.day)));
     });
   }
 }
 
-function getSelectedDays() {
-  return [...document.querySelectorAll('.schedule-chip.selected')].map(c => parseInt(c.dataset.day));
-}
+function uid() { return Date.now() + '_' + Math.random().toString(36).slice(2); }
 
-function toggleDay(el) {
-  el.classList.toggle('selected');
-  saveSettings();
-}
-
-// Panel navigation
+// ── Navigation ─────────────────────────────────────────────
 function showPanel(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -711,278 +483,271 @@ function showPanel(name) {
   document.getElementById('nav-' + name).classList.add('active');
 }
 
-// File handling
-function handleFiles(fileList) {
-  for (const file of fileList) {
-    const reader = new FileReader();
-    const fileData = {
-      id: Date.now() + Math.random(),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      date: new Date().toISOString(),
-      data: null
-    };
-    if (file.size > 5 * 1024 * 1024) {
-      showToast(`${file.name} este prea mare (max 5MB)`, 'error');
-      continue;
-    }
-    reader.onload = (e) => {
-      fileData.data = e.target.result;
-      files.push(fileData);
-      addHistory('upload', `Fișier încărcat: ${file.name}`);
-      saveData();
-      renderFiles();
-      updateStats();
-      showToast(`✅ ${file.name} adăugat!`, 'success');
-    };
-    reader.readAsDataURL(file);
-  }
+// ── Word file ──────────────────────────────────────────────
+function handleWordFile(file) {
+  if (!file) return;
+  document.getElementById('upload-zone').innerHTML =
+    '<div class="upload-icon">⏳</div><div class="upload-title">Se procesează...</div>';
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const res = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+      let paras = res.value.split(/\n\n+/).map(p => p.replace(/\n/g,' ').trim()).filter(p => p.length > 10);
+      if (paras.length < 2)
+        paras = res.value.split(/\n/).map(p => p.trim()).filter(p => p.length > 10);
+      if (!paras.length) { showToast('Fișierul pare gol', 'error'); resetZone(); return; }
+      let added = 0;
+      paras.forEach(p => { if (!texts.find(t => t.content === p)) { texts.push({id:uid(), content:p}); added++; } });
+      addHist('word', `${added} texte importate din "${file.name}"`);
+      persist(); renderTexts(); updateStats(); showRandomPreview();
+      showToast(`✅ ${added} texte importate!`, 'success');
+    } catch { showToast('Eroare la citire', 'error'); }
+    resetZone();
+    document.getElementById('word-input').value = '';
+  };
+  reader.readAsArrayBuffer(file);
 }
 
-function getFileIcon(type) {
-  if (type.startsWith('image/')) return { icon: '🖼️', cls: 'img' };
-  if (type === 'application/pdf') return { icon: '📄', cls: 'pdf' };
-  return { icon: '📝', cls: 'txt' };
+function resetZone() {
+  document.getElementById('upload-zone').innerHTML =
+    '<div class="upload-icon">📄</div><div class="upload-title">Încarcă fișier Word</div><div class="upload-sub">Fiecare paragraf devine un text separat</div><div class="upload-badge">📎 .DOCX acceptat</div>';
 }
 
-function formatSize(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+function onDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
+function onDragLeave() { document.getElementById('upload-zone').classList.remove('drag-over'); }
+function onDrop(e) { e.preventDefault(); onDragLeave(); handleWordFile(e.dataTransfer.files[0]); }
+
+// ── Manual text ────────────────────────────────────────────
+function addManualText() {
+  const t = document.getElementById('manual-text').value.trim();
+  if (!t) { showToast('Scrie un text mai întâi', 'error'); return; }
+  texts.push({id: uid(), content: t});
+  document.getElementById('manual-text').value = '';
+  addHist('add', 'Text adăugat: ' + t.slice(0,50));
+  persist(); renderTexts(); updateStats(); showRandomPreview();
+  showToast('✅ Text adăugat!', 'success');
 }
 
-function formatDate(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+// ── Random ─────────────────────────────────────────────────
+function getRandom() {
+  if (!texts.length) return null;
+  return texts[Math.floor(Math.random() * texts.length)].content;
+}
+function showRandomPreview() {
+  const c = document.getElementById('preview-card');
+  const t = getRandom();
+  if (!t) { c.style.display = 'none'; return; }
+  c.style.display = 'block';
+  document.getElementById('preview-text').textContent = t;
 }
 
-function renderFiles() {
-  const container = document.getElementById('files-list');
-  const empty = document.getElementById('empty-files');
-  if (files.length === 0) {
-    container.innerHTML = '<div class="empty-state" id="empty-files"><div class="empty-icon">📂</div><div class="empty-text">Niciun fișier încărcat încă</div></div>';
+// ── Render texts ───────────────────────────────────────────
+function renderTexts() {
+  const c = document.getElementById('texts-list');
+  if (!texts.length) {
+    c.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">Niciun text adăugat.<br>Încarcă un fișier Word sau scrie manual.</div></div>';
     return;
   }
-  let html = '';
-  files.slice().reverse().forEach(f => {
-    const { icon, cls } = getFileIcon(f.type || '');
-    html += `<div class="file-item">
-      <div class="file-icon ${cls}">${icon}</div>
-      <div class="file-info">
-        <div class="file-name">${f.name}</div>
-        <div class="file-meta">${formatSize(f.size)} · ${formatDate(f.date)}</div>
+  c.innerHTML = texts.map((t,i) => `
+    <div class="text-item">
+      <div class="text-item-header">
+        <span class="text-num">#${i+1}</span>
+        <div class="text-actions">
+          <button class="tbtn del" onclick="delText('${t.id}')">✕ Șterge</button>
+        </div>
       </div>
-      <button class="file-del" onclick="deleteFile('${f.id}')">✕</button>
-    </div>`;
+      <div class="text-content" id="tc${t.id}">${esc(t.content)}</div>
+      <button class="expand-btn" onclick="toggleExp('${t.id}', this)">▼ Extinde</button>
+    </div>`).join('');
+}
+function toggleExp(id, btn) {
+  const el = document.getElementById('tc' + id);
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? '▲ Restrânge' : '▼ Extinde';
+}
+function delText(id) {
+  texts = texts.filter(t => t.id !== id);
+  addHist('del', 'Text șters');
+  persist(); renderTexts(); updateStats(); showRandomPreview();
+  showToast('Text șters', 'warning');
+}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Time slots ─────────────────────────────────────────────
+function renderSlots() {
+  const c = document.getElementById('slots-list');
+  if (!timeSlots.length) { c.innerHTML = ''; return; }
+  c.innerHTML = timeSlots.map(s => `
+    <div class="time-slot">
+      <span class="time-slot-icon">🕐</span>
+      <input class="slot-time-inp" type="time" value="${s.time}" onchange="updSlot('${s.id}', this.value)">
+      <button class="time-del" onclick="delSlot('${s.id}')">✕</button>
+    </div>`).join('');
+  updateStats();
+}
+function addTimeSlot() {
+  const last = timeSlots.length ? timeSlots[timeSlots.length-1].time : '09:00';
+  const [h] = last.split(':').map(Number);
+  const nh = String((h+1)%24).padStart(2,'0');
+  timeSlots.push({id: uid(), time: nh + ':00'});
+  persist(); renderSlots(); renderScheduleStatus();
+}
+function updSlot(id, val) {
+  const s = timeSlots.find(x => x.id === id);
+  if (s) { s.time = val; persist(); renderScheduleStatus(); }
+}
+function delSlot(id) {
+  timeSlots = timeSlots.filter(x => x.id !== id);
+  persist(); renderSlots(); renderScheduleStatus();
+}
+function activeDays() {
+  return [...document.querySelectorAll('.day-chip.on')].map(c => parseInt(c.dataset.day));
+}
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('day-chip')) {
+    e.target.classList.toggle('on');
+    saveSettings(); renderScheduleStatus();
+  }
+});
+
+// ── Schedule status ────────────────────────────────────────
+function renderScheduleStatus() {
+  const c = document.getElementById('schedule-status');
+  if (!timeSlots.length) {
+    c.innerHTML = '<div class="empty"><div class="empty-icon">⏰</div><div class="empty-text">Nicio oră programată</div></div>';
+    return;
+  }
+  const days = ['Lun','Mar','Mie','Joi','Vin','Sâm','Dum'];
+  const adays = activeDays().map(d => days[d]).join(', ') || '—';
+  const sorted = [...timeSlots].sort((a,b) => a.time.localeCompare(b.time));
+  c.innerHTML = sorted.map(s => `
+    <div class="h-item">
+      <div class="h-dot">⏰</div>
+      <div>
+        <div class="h-title">${s.time}</div>
+        <div class="h-time">${adays}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Activate all ───────────────────────────────────────────
+function activateAll() {
+  if (Notification.permission !== 'granted') { requestNotifPermission(); return; }
+  if (!texts.length)     { showToast('Adaugă texte mai întâi!', 'error'); return; }
+  if (!timeSlots.length) { showToast('Adaugă cel puțin o oră!', 'error'); return; }
+
+  scheduledTimers.forEach(clearTimeout);
+  scheduledTimers = [];
+  const adays = activeDays();
+
+  timeSlots.forEach(slot => {
+    const timer = setTimeout(() => {
+      const today = (new Date().getDay() + 6) % 7;
+      if (adays.includes(today)) fireNotif(slot.time);
+      recurse(slot, adays);
+    }, msUntil(slot.time));
+    scheduledTimers.push(timer);
   });
-  container.innerHTML = html;
+
+  saveSettings();
+  addHist('schedule', `${timeSlots.length} ore activate`);
+  persist(); renderScheduleStatus();
+  showToast(`⏰ ${timeSlots.length} ore programate!`, 'success');
 }
 
-function deleteFile(id) {
-  files = files.filter(f => String(f.id) !== String(id));
-  addHistory('delete', 'Fișier șters');
-  saveData(); renderFiles(); updateStats();
-  showToast('Fișier șters', 'warning');
+function recurse(slot, adays) {
+  const t = setTimeout(() => {
+    const today = (new Date().getDay() + 6) % 7;
+    if (adays.includes(today)) fireNotif(slot.time);
+    recurse(slot, adays);
+  }, 86400000);
+  scheduledTimers.push(t);
 }
 
-function saveText() {
-  const txt = document.getElementById('quick-text').value.trim();
-  if (!txt) { showToast('Scrie un text mai întâi', 'error'); return; }
-  const blob = new Blob([txt], { type: 'text/plain' });
-  const f = {
-    id: Date.now(),
-    name: `text_${new Date().toLocaleDateString('ro-RO').replace(/\./g, '-')}.txt`,
-    size: blob.size,
-    type: 'text/plain',
-    date: new Date().toISOString(),
-    data: 'data:text/plain;base64,' + btoa(unescape(encodeURIComponent(txt))),
-    preview: txt.slice(0, 120)
-  };
-  files.push(f);
-  addHistory('text', 'Text salvat: ' + txt.slice(0, 40) + '...');
-  document.getElementById('quick-text').value = '';
-  saveData(); renderFiles(); updateStats();
-  showToast('✅ Text salvat!', 'success');
+function msUntil(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const now = new Date(), target = new Date();
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return target - now;
 }
 
-// Notifications
-async function requestNotifPermission() {
-  if (!('Notification' in window)) {
-    showToast('Notificările nu sunt suportate', 'error'); return;
-  }
-  const perm = await Notification.requestPermission();
-  if (perm === 'granted') {
-    showToast('✅ Notificări activate!', 'success');
-    addHistory('system', 'Notificări activate');
-    saveSettings();
-  } else {
-    showToast('Notificările au fost blocate', 'error');
-  }
+function fireNotif(label) {
+  const txt = getRandom(); if (!txt) return;
+  const title = document.getElementById('notif-title-inp').value || 'NotifyMe 🔔';
+  new Notification(title, { body: txt, vibrate: [200,100,200], tag: 'nm-' + label });
+  sentCount++;
+  addHist('notif', `[${label}] ${txt.slice(0,60)}...`);
+  persist(); updateStats();
 }
 
 function sendTestNotif() {
-  if (Notification.permission !== 'granted') {
-    showToast('Activează notificările mai întâi!', 'warning'); return;
-  }
-  const title = document.getElementById('notif-title-input').value || 'NotifyMe 🔔';
-  const body = document.getElementById('notif-msg').value || 'E timpul să îți revezi fișierele!';
-  const file = files.length > 0 ? files[Math.floor(Math.random() * files.length)] : null;
-  const finalBody = file ? `${body}\n📎 ${file.name}` : body;
-
-  const notif = new Notification(title, {
-    body: finalBody,
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM3YzZmZjciLz48dGV4dCB4PSIzMiIgeT0iNDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMzIiPvCfkrQ8L3RleHQ+PC9zdmc+',
-    vibrate: settings.vibrate ? [200, 100, 200] : [],
-    tag: 'notifyme-daily'
-  });
-  notif.onclick = () => window.focus();
-  notifCount++;
-  addHistory('notif', `Notificare trimisă: ${title}`);
-  saveData(); updateStats();
+  if (Notification.permission !== 'granted') { requestNotifPermission(); return; }
+  if (!texts.length) { showToast('Adaugă texte mai întâi!', 'error'); return; }
+  fireNotif('test');
   showToast('🔔 Notificare trimisă!', 'success');
 }
 
-function scheduleNotification() {
-  if (Notification.permission !== 'granted') {
-    showToast('Activează notificările mai întâi!', 'warning'); return;
-  }
-  saveSettings();
-  const time = document.getElementById('notif-time').value;
-  const [h, m] = time.split(':').map(Number);
-  const now = new Date();
-  let target = new Date();
-  target.setHours(h, m, 0, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
-  const ms = target - now;
-  const mins = Math.round(ms / 60000);
-  addHistory('schedule', `Notificare programată la ${time}`);
-  saveData();
-  showToast(`⏰ Programat pentru ${time} (${mins} min)`, 'success');
-  setTimeout(() => {
-    const days = getSelectedDays();
-    const today = (new Date().getDay() + 6) % 7;
-    if (days.includes(today)) sendTestNotif();
-    scheduleNotification();
-  }, ms);
+async function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('Notificările nu sunt suportate', 'error'); return; }
+  const p = await Notification.requestPermission();
+  if (p === 'granted') { showToast('✅ Notificări activate!', 'success'); addHist('sys', 'Notificări activate'); persist(); }
+  else showToast('Notificările au fost blocate', 'error');
 }
 
-// Email
+// ── Email ──────────────────────────────────────────────────
 function sendTestEmail() {
   const addr = document.getElementById('email-addr').value.trim();
-  if (!addr || !addr.includes('@')) {
-    showToast('Introdu o adresă de email validă!', 'error'); return;
-  }
-  const subject = document.getElementById('email-subject').value || 'Rezumatul tău zilnic NotifyMe';
-  const mailto = `mailto:${addr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(generateEmailBody())}`;
-  window.open(mailto);
-  emailCount++;
-  addHistory('email', `Email trimis la ${addr}`);
-  saveData(); updateStats();
-  showToast('📧 Email client deschis!', 'success');
+  if (!addr || !addr.includes('@')) { showToast('Adresă email invalidă!', 'error'); return; }
+  if (!texts.length) { showToast('Adaugă texte mai întâi!', 'error'); return; }
+  const txt = getRandom();
+  const subj = document.getElementById('email-subject').value || 'Textul zilei — NotifyMe';
+  window.open(`mailto:${addr}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(`Textul tău de azi:\n\n"${txt}"\n\n— NotifyMe`)}`);
+  addHist('email', `Email trimis la ${addr}`);
+  persist(); showToast('📧 Client email deschis!', 'success');
 }
 
-function generateEmailBody() {
-  let body = `Bună ziua!\n\nAcesta este rezumatul tău zilnic de la NotifyMe.\n\n`;
-  if (files.length === 0) {
-    body += 'Nu ai fișiere salvate momentan.\n';
-  } else {
-    body += `Ai ${files.length} fișier(e) salvate:\n`;
-    files.forEach((f, i) => {
-      body += `${i+1}. ${f.name} (${formatSize(f.size)}) - adăugat ${formatDate(f.date)}\n`;
-      if (f.preview) body += `   Preview: ${f.preview}\n`;
-    });
-  }
-  body += `\n— NotifyMe App\n${new Date().toLocaleDateString('ro-RO', {weekday:'long', year:'numeric', month:'long', day:'numeric'})}`;
-  return body;
-}
+// ── History ────────────────────────────────────────────────
+const HI = { word:'📄', add:'✏️', del:'🗑️', notif:'🔔', email:'📧', sys:'⚙️', schedule:'⏰' };
 
-// History
-function addHistory(type, msg) {
-  history.unshift({ type, msg, date: new Date().toISOString() });
-  if (history.length > 50) history = history.slice(0, 50);
-  localStorage.setItem('nm_history', JSON.stringify(history));
+function addHist(type, msg) {
+  history.unshift({type, msg, date: new Date().toISOString()});
+  if (history.length > 60) history = history.slice(0,60);
   renderHistory();
 }
-
-const historyIcons = { upload: '📁', delete: '🗑️', notif: '🔔', email: '📧', system: '⚙️', schedule: '⏰', text: '📝' };
-
 function renderHistory() {
-  const container = document.getElementById('history-list');
-  if (history.length === 0) {
-    container.innerHTML = '<div class="empty-state" id="empty-history"><div class="empty-icon">📋</div><div class="empty-text">Nicio activitate înregistrată</div></div>';
-    return;
-  }
-  let html = '';
-  history.slice(0, 20).forEach(h => {
-    html += `<div class="notif-item">
-      <div class="notif-dot">${historyIcons[h.type] || '📌'}</div>
-      <div class="notif-body">
-        <div class="notif-title">${h.msg}</div>
-        <div class="notif-time">${formatDate(h.date)}</div>
-      </div>
-    </div>`;
-  });
-  container.innerHTML = html;
+  const c = document.getElementById('history-list');
+  if (!history.length) { c.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Nicio activitate</div></div>'; return; }
+  c.innerHTML = history.slice(0,30).map(h => `
+    <div class="h-item">
+      <div class="h-dot">${HI[h.type]||'📌'}</div>
+      <div><div class="h-title">${h.msg}</div><div class="h-time">${fmtDate(h.date)}</div></div>
+    </div>`).join('');
+}
+function clearHistory() { history=[]; persist(); renderHistory(); showToast('Istoric șters','warning'); }
+function clearAll() {
+  if (!confirm('Ștergi toate datele?')) return;
+  texts=[]; timeSlots=[{id:uid(),time:'09:00'}]; history=[]; sentCount=0;
+  persist(); load(); showToast('🗑️ Date șterse','warning');
 }
 
+// ── Utils ──────────────────────────────────────────────────
 function updateStats() {
-  document.getElementById('stat-files').textContent = files.length;
-  document.getElementById('stat-notif').textContent = notifCount;
-  document.getElementById('stat-emails').textContent = emailCount;
+  document.getElementById('s-texts').textContent = texts.length;
+  document.getElementById('s-slots').textContent = timeSlots.length;
+  document.getElementById('s-sent').textContent  = sentCount;
 }
-
-// Toast
-function showToast(msg, type = '') {
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('ro-RO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+function showToast(msg, type='') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.className = 'toast', 3000);
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(t._t); t._t = setTimeout(() => t.className='toast', 3000);
 }
 
-// Drag & drop
-function onDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
-function onDragLeave(e) { document.getElementById('upload-zone').classList.remove('drag-over'); }
-function onDrop(e) {
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('drag-over');
-  handleFiles(e.dataTransfer.files);
-}
-
-// Export
-function exportData() {
-  const d = { files: files.map(f => ({...f, data: '[base64 omis]'})), history, settings, notifCount, emailCount };
-  const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'notifyme-export.json'; a.click();
-  showToast('📤 Date exportate!', 'success');
-}
-
-function clearData() {
-  if (!confirm('Ștergi toate datele? Această acțiune nu poate fi anulată.')) return;
-  files = []; history = []; notifCount = 0; emailCount = 0;
-  localStorage.clear(); loadData();
-  showToast('🗑️ Date șterse', 'warning');
-}
-
-// PWA Install
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); deferredPrompt = e;
-  document.getElementById('install-banner').style.display = 'flex';
-});
-
-function installPWA() {
-  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; document.getElementById('install-banner').style.display = 'none'; }
-  else showToast('Adaugă manual cu "Adaugă la ecran principal"', 'warning');
-}
-
-// Service Worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-
-loadData();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+load();
 </script>
 </body>
 </html>
